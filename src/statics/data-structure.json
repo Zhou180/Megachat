@@ -1,0 +1,40 @@
+{
+  "Users": {
+    "UserID1": {
+      "name": "Danny",
+      "email": "adadsa@yahoo.com",
+      "online": "true"
+    },
+    "UserID2": {
+      "name": "David",
+      "email": "David@yahoo.com",
+      "online": "true"
+    }
+  },
+  "Chats": {
+    "UserID1": {
+      "UserID2": {
+        "MESSAGEID1": {
+          "text": "Hi ",
+          "from": "you"
+        },
+        "MESSAGEID2": {
+          "text": "hello! ",
+          "from": "me"
+        }
+      }
+    },
+    "UserID2": {
+      "UserID1": {
+        "MESSAGEID1": {
+          "text": "Hi ",
+          "from": "me"
+        },
+        "MESSAGEID2": {
+          "text": "hello! ",
+          "from": "you"
+        }
+      }
+    }
+  }
+}
