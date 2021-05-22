@@ -20,19 +20,31 @@
         >
           <span v-if="message.type =='text'">{{message.text}}</span>
 
-          <viewer v-if="message.type =='image'" >
-            <img  :src="message.text" width="500px" height="300px">
-            <q-btn round dense
-                   flat
-                   icon="download"
-                   size="lg"
-                   color="bg-orange-5"
-                   class="position: absolute-bottom-right"
-                   type="a" :href="message.text"
-            >
-              <a :href="message.text"></a>
-            </q-btn>
-          </viewer>
+
+            <div class="messageBox__image" v-if="message.type =='image'" v-viewer="{movable: false}">
+              <img  :src="message.text" class="">
+              <q-btn round dense
+                     flat
+                     icon="download"
+                     size="lg"
+                     color="bg-orange-5"
+                     class="absolute-bottom-right"
+                     type="a" :href="message.text"
+              >
+                <a :href="message.text" class="display:none"></a>
+              </q-btn>
+            </div>
+<!--            <q-btn round dense-->
+<!--                   flat-->
+<!--                   icon="download"-->
+<!--                   size="lg"-->
+<!--                   color="bg-orange-5"-->
+<!--                   class="on-left"-->
+<!--                   type="a" :href="message.text"-->
+<!--            >-->
+<!--              <a :href="message.text"></a>-->
+<!--            </q-btn>-->
+
         </q-chat-message>
 
     </div>
@@ -246,6 +258,13 @@ export default {
         background-color: #000;
         color: #fff;
 
-
+  .messageBox__image {
+    margin: 5px 25px 5px 5px;
+  }
+  .messageBox__image img {
+    border-radius: 5px;
+    max-width: 100%;
+    max-height: 335px;
+  }
 
 </style>
