@@ -16,15 +16,31 @@
           v-for="(message,key) in messages"
           :name="message.from =='me'? userDetails.name:otherUserDetails.name"
           :key="key"
-          :text="[message.text]"
           :sent="message.from== 'me'? true:false"
         >
+          <span v-if="message.type =='text'">{{message.text}}</span>
+
+          <viewer v-if="message.type =='image'" >
+            <img  :src="message.text" width="500px" height="300px">
+            <q-btn round dense
+                   flat
+                   icon="download"
+                   size="lg"
+                   color="bg-orange-5"
+                   class="position: absolute-bottom-right"
+                   type="a" :href="message.text"
+            >
+              <a :href="message.text"></a>
+            </q-btn>
+          </viewer>
         </q-chat-message>
+
     </div>
 
     <q-footer elevated >
       <q-toolbar class="bg-orange-5">
-        <q-form  class="full-width"  @keyup.enter="sendMessage">
+        <q-form  class="full-width row-md"  @keyup.enter="sendMessage()">
+
           <q-input
             ref="keepfocus"
             @blur="scrollToBottom"
@@ -36,10 +52,63 @@
             outlined
             label="Message"
             dense>
+            <input ref="myFileInput" style="display:none" type="file" accept="image/*" @change="sendImage($event)">
+<!--            <q-input ref="myFileInput" style="display:none" v-model="file" type="file" ></q-input>-->
+            <q-btn rounded outlined flat color="grey-7" icon="add_to_photos" @click="$refs.myFileInput.click()"></q-btn>
+            <template v-slot:before>
+              <q-btn
+
+                round dense
+                flat
+                icon="settings"
+              >
+
+                <q-menu>
+                  <q-list style="min-width: 100px">
+                    <q-item clickable v-close-popup :to="/album/+$route.params.otherUserID">
+                      <q-item-section avatar>
+                        <q-icon color="grey-7" name="photo_album" />
+                      </q-item-section>
+                      <q-item-section>相簿</q-item-section>
+                    </q-item>
+                    <q-separator />
+
+                    <q-item clickable v-close-popup>
+                      <q-item-section avatar>
+                        <q-icon color="grey-7" name="attachment" />
+                      </q-item-section>
+                      <q-item-section>連接</q-item-section>
+                    </q-item>
+                    <q-separator />
+
+                    <q-item clickable v-close-popup>
+                      <q-item-section avatar>
+                        <q-icon color="grey-7" name="folder" />
+                      </q-item-section>
+                      <q-item-section>檔案</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+
+              <q-btn
+                :to='routeID'
+                round dense
+                flat
+                icon="upload"
+              >
+                <q-tooltip>
+                  上傳
+                </q-tooltip>
+              </q-btn>
+              <div>
+<!--                <q-input ref="myFileInput" style="display:none" v-model="file" type="file" label="Standard" ></q-input>-->
+<!--                <q-btn rounded outlined flat color="dark" icon="cloud_upload" @click="getFile"></q-btn>-->
+              </div>
+            </template>
 
             <template v-slot:after>
               <q-btn
-
                 @click="sendMessage"
                 round dense
                 flat
@@ -53,9 +122,20 @@
   </q-page>
 </template>
 
+<script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous">
+</script>
 <script>
 import {mapActions,mapState} from 'vuex'
 import mixinOtherUserDetails from 'src/mixins/mixin-other-user-details'
+import Vue from 'vue'
+import Viewer from 'v-viewer'
+import 'viewerjs/dist/viewer.css'
+Vue.use(Viewer)
+
+
 
 export default {
   mixins: [mixinOtherUserDetails],
@@ -63,11 +143,15 @@ export default {
     return {
       newMessage: '',
       showMessages:false,
+      file: []
     }
   },
 
   computed: {
     ...mapState('store',['messages',"userDetails"]),
+    routeID() {
+      return "/addfile/" + this.$route.params.otherUserID
+    }
 
   },
 
@@ -83,8 +167,10 @@ export default {
   },
 
   methods: {
-    ...mapActions('store',['firebaseGetMessage',"firebaseStopGetMessage",'firebaseSendMessage']),
-
+    ...mapActions('store',['firebaseGetMessage',"firebaseStopGetMessage",'firebaseSendMessage','firebaseSendImage']),
+    imgclick(type,text){
+      if(type == "text") return ['fuckyou']
+    },
     scrollToBottom(){
       let pageChat = this.$refs.pageChat.$el
       setTimeout(()=> {
@@ -96,12 +182,27 @@ export default {
       this.firebaseSendMessage({
         message:{
           text: this.newMessage,
-          from:"me"
+          from:"me",
+          type:"text"
         },
         otherUserID:this.$route.params.otherUserID
       })
       this.newMessage=""
       this.$refs.keepfocus.focus()
+    },
+
+
+    sendImage(e) {
+      const file = e.target.files[0]
+      const metadata = {
+        contentType: 'image/*'
+      };
+      // console.log(file)
+      this.firebaseSendImage({
+        file,
+        otherUserID:this.$route.params.otherUserID,
+        metadata
+      })
 
     }
   },
@@ -110,9 +211,9 @@ export default {
     this.firebaseGetMessage(this.$route.params.otherUserID)
   },
 
-  destroyed() {
-    this.firebaseStopGetMessage()
-  }
+  // destroyed() {
+  //   this.firebaseStopGetMessage()
+  // }
 }
 </script>
 <style lang="stylus">
@@ -124,9 +225,27 @@ export default {
         padding-top  env(safe-area-inset-top)
 
   .q-banner
-    top 100px
-    z-index 2
+    top 65px
+    z-index 1
     opacity 0.7
   .q-message
     z-index 1
+
+  .input-file
+    &__input
+      visibility: hidden;
+    &__button
+      background-color: red;
+      width: 200px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+
+      &:hover
+        background-color: #000;
+        color: #fff;
+
+
+
 </style>

@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import {
   firebaseAuth,
-  firebaseDB
+  firebaseDB,
+  firebaseStorage
 } from 'boot/firebase'
 
 let messageRef
@@ -27,7 +28,6 @@ const mutations = {
   },
   clearMessages(state,payload) {
     state.messages={}
-    console.log("clear~");
   },
 
 }
@@ -157,8 +157,72 @@ const actions = {
     payload.message.from = 'you'
     firebaseDB.ref('Chats/'+payload.otherUserID+'/'+state.userDetails.userID)
       .push(payload.message)
-    console.log('sendmessage')
+
   },
+
+  firebaseUploadFile({state,commit},payload){
+    let userID = state.userDetails.userID
+
+    firebaseStorage.ref(userID + '/' + payload.otherUserID)
+      .put(payload.files)
+  },
+
+  firebaseSendImage({state,commit},payload){
+    let userID = state.userDetails.userID
+    let fileName = Math.floor(Date.now() / 1000) +'-'+payload.file.name
+    let uploadref = firebaseStorage.ref('images/'+userID+'/'+payload.otherUserID+"/"+fileName)
+    let uploadTask = uploadref.put(payload.file,payload.metadata)
+
+    uploadTask.on("state_changed",
+      /* 上傳進度 */
+      function(snapshot) {
+        let progress = Math.floor((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+
+      },
+      /* 錯誤處理 */
+      function(error) {
+        firebaseDB.ref('Chats/'+state.userDetails.userID+'/'+payload.otherUserID)
+          .push({
+            type: 'image',
+            message: error.code,
+            timeStamp: Math.floor(Date.now() / 1000),
+            from:'me'
+          })
+        firebaseDB.ref('Chats/'+state.userDetails.userID+'/'+payload.otherUserID)
+          .push({
+            type: 'image',
+            message: error.code,
+            timeStamp: Math.floor(Date.now() / 1000),
+            from:'you'
+          })
+      },
+      /* 上傳結束處理 */
+      function() {
+        var Imagemessage = {
+          text: "",
+          from: "me",
+          type: "image"
+        }
+
+        var downloadurl =  uploadref.getDownloadURL()
+          .then(function (url) {
+            Imagemessage.text = url.toString()
+            firebaseDB.ref('Chats/'+state.userDetails.userID+'/'+payload.otherUserID)
+              .push(Imagemessage)
+
+            Imagemessage.from = 'you'
+
+            firebaseDB.ref('Chats/'+payload.otherUserID+'/'+state.userDetails.userID)
+              .push(Imagemessage)
+          })
+          .catch(function (err) {
+            console.log(err)
+          })
+
+
+
+      });
+  }
 
 }
 
@@ -174,6 +238,16 @@ const getters = {
      }
    })
    return usersFiltered
+ },
+ images: state => {
+   let imageMessage = {}
+   Object.keys(state.messages).forEach(key => {
+     if(state.messages[key].type == 'image'){
+       imageMessage[key] = state.messages[key]
+     }
+   })
+
+   return imageMessage
  }
 }
 

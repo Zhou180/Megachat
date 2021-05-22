@@ -10,11 +10,14 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@morioh/v-lightbox": "^1.0.3",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "firebase": "^8.4.3",
-    "quasar": "^1.0.0"
+    "node.js": "0.0.1-security",
+    "quasar": "^1.0.0",
+    "v-viewer": "^1.5.1"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

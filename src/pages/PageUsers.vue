@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   data () {
@@ -42,6 +42,7 @@ export default {
   },
   computed: {
      ...mapGetters('store',['users'])
-  }
+  },
+
 }
 </script>

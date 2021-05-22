@@ -3,18 +3,15 @@
     <q-header elevated>
       <q-toolbar class="bg-orange-5 text-white">
         <q-btn
-          v-if="$route.fullPath.includes('/chat')"
+          v-if="backvisible()"
           v-go-back.single
           color="amber"
           icon="arrow_back"
           label="back"
         />
-
-
         <q-toolbar-title class="absolute-center">
           {{ title }}
         </q-toolbar-title>
-
         <q-space></q-space>
         <q-btn
           v-if="!userDetails.userID"
@@ -26,7 +23,6 @@
           flat
           dense
         />
-
         <q-btn
           v-else
           @click="logoutUser"
@@ -39,9 +35,9 @@
           Logout<br>
           {{userDetails.name}}
         </q-btn>
-
       </q-toolbar>
     </q-header>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -64,7 +60,6 @@ export default {
   data () {
     return {
       leftDrawerOpen: false,
-      // essentialLinks: linksData
     }
   },
   computed: {
@@ -74,11 +69,19 @@ export default {
       if (currentpath=='/') return 'mega'
       else  if (currentpath.includes('/chat')) return this.otherUserDetails.name
       else  if (currentpath == '/auth') return 'Auth'
+      else if (currentpath == '/addfile') return 'Addfiles'
 
     }
   },
   methods: {
-    ...mapActions("store",['logoutUser'])
+    ...mapActions("store",['logoutUser']),
+    backvisible() {
+      if(this.$route.fullPath.includes('/chat') || this.$route.fullPath.includes('/addfile')||this.$route.fullPath.includes('/album')){
+        return true
+      }else{
+        return false
+      }
+    }
   }
 }
 </script>

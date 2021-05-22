@@ -3,6 +3,8 @@ import firebase from "firebase/app";
 // Add the Firebase products that you want to use
 import "firebase/auth";
 import "firebase/database";
+import "firebase/storage";
+
 
 var firebaseConfig = {
   apiKey: "AIzaSyD_lKJ8vcQJl_bAVY7FEdi6V83k_FdQvX8",
@@ -19,7 +21,9 @@ var firebaseConfig = {
 let firebaseApp = firebase.initializeApp(firebaseConfig)
 let firebaseAuth = firebaseApp.auth()
 let firebaseDB = firebaseApp.database()
+let firebaseStorage = firebaseApp.storage()
+
 
 export {
-  firebaseAuth, firebaseDB
+  firebaseAuth, firebaseDB,firebaseStorage
 }

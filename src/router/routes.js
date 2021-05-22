@@ -7,7 +7,8 @@ const routes = [
       { path: '', component: () => import('pages/PageUsers.vue') },
       { path: '/chat/:otherUserID', component: () => import('pages/PageChat.vue') },
       { path: '/auth', component: () => import('pages/PageAuth.vue') },
-
+      { path:'/addfile/:otherUserID',component: () => import('pages/Pageaddfile.vue')},
+      { path:'/album/:otherUserID',component: () => import('pages/PageAlbum.vue')}
     ]
   },
 
