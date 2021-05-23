@@ -215,7 +215,7 @@ export default {
         otherUserID:this.$route.params.otherUserID,
         metadata
       })
-
+      this.$refs.keepfocus.focus()
     }
   },
 
@@ -223,9 +223,9 @@ export default {
     this.firebaseGetMessage(this.$route.params.otherUserID)
   },
 
-  // destroyed() {
-  //   this.firebaseStopGetMessage()
-  // }
+  destroyed() {
+    this.firebaseStopGetMessage()
+  }
 }
 </script>
 <style lang="stylus">
