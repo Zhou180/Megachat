@@ -1,4 +1,4 @@
-# MegaChat (megachat)
+# MegaChat 
 
 A Quasar Framework app
 
